@@ -41,7 +41,6 @@ export default function PreferencesStep({
         render={({ field }) => (
           <SelectField
             label="Category"
-            name="category"
             id="category"
             value={field.value}
             onChange={field.onChange}
@@ -63,7 +62,6 @@ export default function PreferencesStep({
             label="Interests"
             values={field.value}
             id="interests"
-            name="interests"
             onChange={field.onChange}
             options={interests}
             required
