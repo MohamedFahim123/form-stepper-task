@@ -11,5 +11,5 @@ const INTERESTS_FILE_PATH = ["src", "app", "api", "interests", "data.json"];
 export async function GET() {
   const data = await readJsonFile<InterestsFileData>(INTERESTS_FILE_PATH);
 
-  return NextResponse.json(data);
+  return NextResponse.json(data.interests);
 }

@@ -1,8 +1,13 @@
-import { Category, Country, User } from "@/types/UserTypes";
+import type { Category, Country, Interest, User } from "@/types/UserTypes";
 import { fetchApi } from "@/utils/fetchApi";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  createUserAction,
+  type UserPayload,
+} from "@/actions/userActions";
 
-export type UserPayload = Omit<User, "id" | "createdAt">;
+export type { UserPayload };
+
 export const UserQueries = {
   countries: ["countries"],
   categories: ["categories"],
@@ -25,7 +30,7 @@ export const useCategoriesQuery = () =>
 export const useInterestsQuery = () =>
   useQuery({
     queryKey: UserQueries.interests,
-    queryFn: () => fetchApi("interests"),
+    queryFn: () => fetchApi<Interest[]>("interests"),
   });
 
 export const useUsersQuery = () =>
@@ -37,15 +42,10 @@ export const useUsersQuery = () =>
 export const useMutateUser = () => {
   const queryClient = useQueryClient();
 
-  useMutation({
-    mutationFn: (user: UserPayload) =>
-      fetchApi("users", {
-        method: "POST",
-        body: JSON.stringify(user),
-      }),
-    onSuccess: (data) => {
-      queryClient.setQueryData(UserQueries.users, data);
+  return useMutation({
+    mutationFn: (user: UserPayload) => createUserAction(user),
+    onSuccess: (users) => {
+      queryClient.setQueryData(UserQueries.users, users);
     },
-    
   });
 };

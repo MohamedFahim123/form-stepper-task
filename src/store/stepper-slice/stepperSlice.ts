@@ -31,7 +31,7 @@ const stepperReducer = createSlice({
     },
     nextStep: (state) => {
       completeStep(state, state.currentStep);
-      state.currentStep += 1;
+      state.currentStep = getValidStep(state.currentStep + 1);
     },
     prevStep: (state) => {
       state.currentStep = getValidStep(state.currentStep - 1);

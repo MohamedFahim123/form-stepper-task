@@ -11,5 +11,5 @@ const COUNTRIES_FILE_PATH = ["src", "app", "api", "countries", "data.json"];
 export async function GET() {
   const data = await readJsonFile<CountriesFileData>(COUNTRIES_FILE_PATH);
 
-  return NextResponse.json(data);
+  return NextResponse.json(data.countries);
 }

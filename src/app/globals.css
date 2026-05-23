@@ -3,7 +3,7 @@
 
 @theme {
   /* Fonts */
-  --font-inter: var(--font-inter), sans-serif;
+  --font-inter: Inter, sans-serif;
 
   /* App colors */
   --color-background: #f8fafc;
@@ -85,11 +85,11 @@
   --text-body--line-height: 1.5;
   --text-body--font-weight: 400;
 
-  --text-body-sm: 0.875rem;
+  --text-body-sm: 0.95rem;
   --text-body-sm--line-height: 1.5;
   --text-body-sm--font-weight: 400;
 
-  --text-caption: 0.75rem;
+  --text-caption: 0.85rem;
   --text-caption--line-height: 1.5;
   --text-caption--font-weight: 400;
 
@@ -106,6 +106,10 @@
 }
 
 @layer base {
+  :root {
+    font-family: font-inter, system-ui, sans-serif;
+  }
+
   html {
     @apply font-inter;
   }
@@ -132,7 +136,7 @@
 
 @layer components {
   .app-container {
-    @apply mx-auto w-full max-w-[1200px] px-4 py-6 sm:px-6 sm:py-8;
+    @apply mx-auto w-full max-w-[1000px] px-4 py-6 sm:px-6 sm:py-8;
   }
 
   .ds-section {
@@ -153,7 +157,7 @@
   }
 
   .field-label {
-    @apply text-body-sm font-semibold text-foreground;
+    @apply text-body-sm font-normal text-foreground;
   }
 
   .field-required {
@@ -173,11 +177,15 @@
   }
 
   .form-input-error {
-    @apply border-red-500 focus:border-red-500 focus:ring-red-500/20;
+    @apply border-red-500 focus:border-red-500 focus:ring-red-500/10;
   }
 
   .btn-primary {
     @apply inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 text-body-sm font-semibold text-white transition hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-600/30 disabled:pointer-events-none disabled:bg-slate-300 disabled:text-slate-600;
+  }
+
+  .btn-submit {
+    @apply inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-green-600 px-4 text-body-sm font-semibold text-white transition hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600/30 disabled:pointer-events-none disabled:bg-slate-300 disabled:text-slate-600;
   }
 
   .btn-secondary {
@@ -214,7 +222,7 @@
   }
 
   .badge {
-    @apply inline-flex items-center rounded-full bg-primary-50 px-2 py-1 text-caption font-medium text-primary-700;
+    @apply inline-flex items-center rounded-full bg-primary-100 px-2 py-1 text-xs font-medium text-primary-800;
   }
 
   .dropdown-panel {
