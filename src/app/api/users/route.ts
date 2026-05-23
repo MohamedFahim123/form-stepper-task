@@ -1,16 +1,20 @@
 import type { User } from "@/types/UserTypes";
 import { NextResponse } from "next/server";
-import { createUserAction, getUsersAction } from "@/actions/userActions";
+import { users } from "./data";
 
 export async function GET() {
-  const users = await getUsersAction();
-
   return NextResponse.json(users);
 }
 
 export async function POST(request: Request) {
   const userPayload = (await request.json()) as Omit<User, "id" | "createdAt">;
-  const users = await createUserAction(userPayload);
+  const user: User = {
+    ...userPayload,
+    id: crypto.randomUUID(),
+    createdAt: new Date().toISOString(),
+  };
+
+  users.push(user);
 
   return NextResponse.json({ users }, { status: 201 });
 }

@@ -1,9 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import UsersTable from "@/components/organisms/UsersTable";
-import { getUsersAction } from "@/actions/userActions";
+import { useUsersQuery } from "@/services/user.service";
 
-export default async function UsersTemplate() {
-  const users = await getUsersAction();
+export default function UsersTemplate() {
+  const usersQuery = useUsersQuery();
 
   return (
     <main className="app-container space-y-6">
@@ -15,7 +17,12 @@ export default async function UsersTemplate() {
           Add User
         </Link>
       </div>
-      <UsersTable users={users} />
+      <UsersTable
+        users={usersQuery.data ?? []}
+        isLoading={usersQuery.isLoading}
+        isError={usersQuery.isError}
+        onRetry={() => usersQuery.refetch()}
+      />
     </main>
   );
 }

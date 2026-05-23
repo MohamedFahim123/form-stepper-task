@@ -84,7 +84,6 @@ export default function UsersTable({
     <section className="space-y-4">
       <div className="flex flex-col gap-4 rounded-lg border border-slate-200 bg-surface p-4 shadow-card sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-heading-2">Users</h2>
           <p className="text-body-sm text-muted-foreground">
             {users.length} total {users.length === 1 ? "user" : "users"}
             {globalFilter && !isLoading && !isError
