@@ -76,8 +76,6 @@ export default function PreferencesStep({
         name="avatar"
         render={({ field }) => (
           <FileUploadField
-            id="avatar"
-            name="avatar"
             label="Avatar Upload"
             value={field.value}
             onChange={field.onChange}
