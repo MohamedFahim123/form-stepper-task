@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 
-export const META_DATA = {
+export const HOME_META_DATA = {
   title: "User Manager System | React Stepper",
   description:
     "A modern user management system built with Next.js, TypeScript, Tailwind CSS, Redux Toolkit, React Hook Form, TanStack Query, and TanStack Table.",
@@ -15,6 +15,15 @@ export const META_DATA = {
     "TanStack Query",
     "TanStack Table",
   ],
+  authors: [{ name: "Mohamed Fahim" }],
+  creator: "Mohamed Fahim",
+} as Metadata;
+
+export const USERS_META_DATA = {
+  title: "Users | User Manager System",
+  description:
+    "View and manage users in the User Manager System.",
+  keywords: ["Users", "User Manager System", "View Users", "Manage Users"],
   authors: [{ name: "Mohamed Fahim" }],
   creator: "Mohamed Fahim",
 } as Metadata;

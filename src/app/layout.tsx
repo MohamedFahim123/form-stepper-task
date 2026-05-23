@@ -1,4 +1,6 @@
-import { META_DATA } from "@/utils/metaData";
+import { AppQueryClientProvider } from "@/components/providers/AppQueryClientProvider";
+import { StoreProvider } from "@/components/providers/StoreProvider";
+import { HOME_META_DATA } from "@/utils/metaData";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -8,7 +10,7 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-export const metadata: Metadata = META_DATA;
+export const metadata: Metadata = HOME_META_DATA;
 
 export default function RootLayout({
   children,
@@ -17,7 +19,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col font-inter">{children}</body>
+      <body className="min-h-full flex flex-col font-inter">
+        <StoreProvider>
+          <AppQueryClientProvider>{children}</AppQueryClientProvider>
+        </StoreProvider>
+      </body>
     </html>
   );
 }
