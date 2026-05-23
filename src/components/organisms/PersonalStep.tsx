@@ -48,7 +48,6 @@ export default function PersonalStep({
       >
         <Input
           id="fullName"
-          name="fullName"
           autoComplete="name"
           placeholder="Maged Yaseen"
           error={!!errors.fullName}
