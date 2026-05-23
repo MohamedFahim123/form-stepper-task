@@ -61,7 +61,6 @@ export default function PreferencesStep({
           <MultiSelectField
             label="Interests"
             values={field.value}
-            id="interests"
             onChange={field.onChange}
             options={interests}
             required
