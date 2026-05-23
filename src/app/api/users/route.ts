@@ -1,5 +1,6 @@
 import type { User } from "@/types/UserTypes";
 import { NextResponse } from "next/server";
+import { createUserAction, getUsersAction } from "@/actions/userActions";
 
 export async function GET() {
   const users = await getUsersAction();
