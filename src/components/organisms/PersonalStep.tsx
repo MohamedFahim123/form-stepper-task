@@ -93,12 +93,13 @@ export default function PersonalStep({
             value={field.value || ""}
             onChange={field.onChange}
             options={countries}
-            placeholder={
-              optionsLoading ? "Loading countries..." : "Select country"
-            }
+            placeholder="Select country"
             optional
             searchable
-            disabled={optionsLoading || optionsError}
+            loading={optionsLoading}
+            loadingText="Loading countries..."
+            pageSize={20}
+            disabled={optionsError}
             error={errors.country?.message}
           />
         )}

@@ -114,6 +114,7 @@ export const useAddNewUserForm = () => {
     countriesQuery.isLoading ||
     categoriesQuery.isLoading ||
     interestsQuery.isLoading;
+  const countriesLoading = countriesQuery.isLoading;
 
   const optionsError =
     countriesQuery.isError || categoriesQuery.isError || interestsQuery.isError;
@@ -159,6 +160,7 @@ export const useAddNewUserForm = () => {
     categoryOptions,
     interestOptions,
     optionsLoading,
+    countriesLoading,
     createUser,
     success,
     optionsError,

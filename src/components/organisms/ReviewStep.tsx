@@ -1,4 +1,4 @@
-import { Check, ChevronLeft } from "lucide-react";
+import { CircleCheckBig , ChevronLeft, Check } from "lucide-react";
 import { Button } from "@/components/atoms/Button";
 import { Badge } from "@/components/atoms/Badge";
 import { ReviewRow } from "@/components/molecules/ReviewRow";
@@ -61,7 +61,7 @@ export default function ReviewStep({
       </div>
       <div className="rounded-lg border border-primary-200 bg-primary-50 p-4 text-primary-700">
         <div className="flex gap-3">
-          <Check size={20} aria-hidden />
+          <CircleCheckBig size={20} aria-hidden />
           <div>
             <p className="font-semibold">Ready to submit</p>
             <p className="text-caption">

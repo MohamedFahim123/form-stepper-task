@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronDown, Search, X } from "lucide-react";
+import { AlertTriangle, Check, ChevronDown, Search, X } from "lucide-react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { Badge } from "@/components/atoms/Badge";
 import { FormField } from "@/components/molecules/FormField";
@@ -41,6 +41,7 @@ export function MultiSelectField<T extends string>({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const selected = options.filter((option) => values.includes(option.value));
   const visible = open && !disabled;
+  const maxSelected = values.length >= max;
   const filtered = useMemo(
     () =>
       options.filter((option) =>
@@ -171,7 +172,7 @@ export function MultiSelectField<T extends string>({
           </span>
         </button>
         {visible && (
-          <div className="dropdown-panel absolute left-0 right-0 z-20 mt-1 max-h-64 overflow-auto p-2">
+          <div className="dropdown-panel absolute left-0 right-0 z-20 mt-1 max-h-64 overflow-auto">
             <div className="relative mb-2">
               <Search
                 size={16}
@@ -186,10 +187,20 @@ export function MultiSelectField<T extends string>({
                 autoFocus
               />
             </div>
+            {maxSelected && (
+              <div
+                role="status"
+                aria-live="polite"
+                className="mb-2 flex items-center gap-2 px-4 text-caption text-danger"
+              >
+                <AlertTriangle size={14} aria-hidden />
+                Maximum of {max} selections reached.
+              </div>
+            )}
             <ul id={listId} role="listbox" aria-multiselectable="true">
               {filtered.map((option) => {
                 const checked = values.includes(option.value);
-                const disabled = !checked && values.length >= max;
+                const disabled = !checked && maxSelected;
                 return (
                   <li key={option.value} role="option" aria-selected={checked}>
                     <button

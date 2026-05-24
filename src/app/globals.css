@@ -181,23 +181,23 @@
   }
 
   .btn-primary {
-    @apply inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 text-body-sm font-semibold text-white transition hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-600/30 disabled:pointer-events-none disabled:bg-slate-300 disabled:text-slate-600;
+    @apply inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-primary-600 px-6 text-body-sm font-semibold text-white transition hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-600/30 disabled:pointer-events-none disabled:bg-slate-300 disabled:text-slate-600;
   }
 
   .btn-submit {
-    @apply inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-green-600 px-4 text-body-sm font-semibold text-white transition hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600/30 disabled:pointer-events-none disabled:bg-slate-300 disabled:text-slate-600;
+    @apply inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-green-600 px-6 text-body-sm font-semibold text-white transition hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600/30 disabled:pointer-events-none disabled:bg-slate-300 disabled:text-slate-600;
   }
 
   .btn-secondary {
-    @apply inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-primary-600 bg-surface px-4 text-body-sm font-semibold text-primary-700 transition hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-primary-600/30 disabled:pointer-events-none disabled:border-slate-300 disabled:text-slate-500;
+    @apply inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-primary-600 bg-surface px-6 text-body-sm font-semibold text-primary-700 transition hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-primary-600/30 disabled:pointer-events-none disabled:border-slate-300 disabled:text-slate-500;
   }
 
   .btn-ghost {
-    @apply inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-transparent px-4 text-body-sm font-semibold text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-600/30 disabled:pointer-events-none disabled:text-slate-400;
+    @apply inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-transparent px-6 text-body-sm font-semibold text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-600/30 disabled:pointer-events-none disabled:text-slate-400;
   }
 
   .btn-accent {
-    @apply inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-accent-500 px-4 text-body-sm font-semibold text-white transition hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-accent-500/30 disabled:pointer-events-none disabled:bg-slate-300 disabled:text-slate-600;
+    @apply inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-accent-500 px-6 text-body-sm font-semibold text-white transition hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-accent-500/30 disabled:pointer-events-none disabled:bg-slate-300 disabled:text-slate-600;
   }
 
   .step-circle {

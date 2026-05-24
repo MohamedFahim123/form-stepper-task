@@ -17,6 +17,7 @@ export default function AddUserTemplate() {
     categoryOptions,
     interestOptions,
     optionsLoading,
+    countriesLoading,
     createUser,
     success,
     optionsError,
@@ -44,7 +45,7 @@ export default function AddUserTemplate() {
           control={form.control}
           errors={form.formState.errors}
           countries={countryOptions}
-          optionsLoading={optionsLoading}
+          optionsLoading={countriesLoading}
           optionsError={optionsError}
           onNext={goNext}
         />

@@ -1,7 +1,15 @@
 "use client";
 
-import { Check, ChevronDown, Search } from "lucide-react";
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { Check, ChevronDown, LoaderCircle, Search } from "lucide-react";
+import {
+  type UIEvent,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { cn } from "@/utils/twMerge";
 import { FormField } from "@/components/molecules/FormField";
 
@@ -19,6 +27,9 @@ type SelectFieldProps<T extends string> = {
   error?: string;
   searchable?: boolean;
   disabled?: boolean;
+  loading?: boolean;
+  loadingText?: string;
+  pageSize?: number;
 };
 
 export function SelectField<T extends string>({
@@ -33,16 +44,27 @@ export function SelectField<T extends string>({
   error,
   searchable,
   disabled,
+  loading,
+  loadingText = "Loading options...",
+  pageSize,
 }: SelectFieldProps<T>) {
   const reactId = useId();
   const fieldId = id ?? reactId;
   const listId = `${fieldId}-listbox`;
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [visibleCount, setVisibleCount] = useState(
+    () => pageSize ?? options.length,
+  );
+  const [loadingMore, setLoadingMore] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const loadingMoreTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   const selected = options.find((option) => option.value === value);
   const visible = open && !disabled;
+  const canPaginate = Boolean(pageSize);
   const filtered = useMemo(
     () =>
       options.filter((option) =>
@@ -50,6 +72,40 @@ export function SelectField<T extends string>({
       ),
     [options, query],
   );
+  const visibleOptions = canPaginate
+    ? filtered.slice(0, visibleCount)
+    : filtered;
+  const hasMoreOptions = visibleOptions.length < filtered.length;
+  const resetVisibleCount = useCallback(() => {
+    setVisibleCount(pageSize ?? options.length);
+  }, [options.length, pageSize]);
+
+  const loadNextPage = () => {
+    if (
+      !pageSize ||
+      loadingMore ||
+      loadingMoreTimeoutRef.current ||
+      !hasMoreOptions
+    ) {
+      return;
+    }
+
+    setLoadingMore(true);
+    loadingMoreTimeoutRef.current = setTimeout(() => {
+      setVisibleCount((currentCount) =>
+        Math.min(currentCount + pageSize, filtered.length),
+      );
+      setLoadingMore(false);
+      loadingMoreTimeoutRef.current = null;
+    }, 200);
+  };
+
+  const handleOptionsScroll = (event: UIEvent<HTMLDivElement>) => {
+    const { scrollHeight, scrollTop, clientHeight } = event.currentTarget;
+    const reachedBottom = scrollHeight - scrollTop - clientHeight < 24;
+
+    if (reachedBottom) loadNextPage();
+  };
 
   useEffect(() => {
     if (!visible) return;
@@ -58,6 +114,7 @@ export function SelectField<T extends string>({
       if (!wrapperRef.current?.contains(event.target as Node)) {
         setOpen(false);
         setQuery("");
+        resetVisibleCount();
       }
     };
 
@@ -65,6 +122,7 @@ export function SelectField<T extends string>({
       if (event.key === "Escape") {
         setOpen(false);
         setQuery("");
+        resetVisibleCount();
         buttonRef.current?.focus();
       }
     };
@@ -76,7 +134,15 @@ export function SelectField<T extends string>({
       document.removeEventListener("pointerdown", closeOnOutsideClick);
       document.removeEventListener("keydown", closeOnEscape);
     };
-  }, [visible]);
+  }, [resetVisibleCount, visible]);
+
+  useEffect(() => {
+    return () => {
+      if (loadingMoreTimeoutRef.current) {
+        clearTimeout(loadingMoreTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <FormField
@@ -96,7 +162,11 @@ export function SelectField<T extends string>({
           aria-controls={listId}
           disabled={disabled}
           onClick={() => {
-            if (!disabled) setOpen((v) => !v);
+            if (!disabled) {
+              if (open) setQuery("");
+              resetVisibleCount();
+              setOpen(!open);
+            }
           }}
           className={cn(
             "form-input flex items-center justify-between text-left",
@@ -114,9 +184,9 @@ export function SelectField<T extends string>({
           />
         </button>
         {visible && (
-          <div className="dropdown-panel absolute left-0 right-0 z-20 mt-1 max-h-60 overflow-auto p-2">
+          <div className="dropdown-panel absolute left-0 right-0 z-20 mt-1">
             {searchable && (
-              <div className="relative mb-2">
+              <div className="relative m-2">
                 <Search
                   size={16}
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
@@ -126,53 +196,87 @@ export function SelectField<T extends string>({
                   className="form-input h-9 pl-9"
                   placeholder="Search..."
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(e) => {
+                    setQuery(e.target.value);
+                    resetVisibleCount();
+                  }}
                   autoFocus
                 />
               </div>
             )}
-            <ul
-              id={listId}
-              role="listbox"
-              aria-labelledby={fieldId}
-              tabIndex={-1}
+            <div
+              className="max-h-52 overflow-auto"
+              onScroll={handleOptionsScroll}
             >
-              {filtered.map((option) => {
-                const active = option.value === value;
-                return (
-                  <li key={option.value} role="option" aria-selected={active}>
-                    <button
-                      type="button"
-                      className={cn(
-                        "dropdown-item w-full",
-                        active && "dropdown-item-active",
-                      )}
-                      onClick={() => {
-                        onChange(option.value);
-                        setOpen(false);
-                        setQuery("");
-                        buttonRef.current?.focus();
-                      }}
-                    >
-                      <span>
-                        {option.code && (
-                          <span className="mr-1 text-caption uppercase">
-                            {option.code}
-                          </span>
-                        )}
-                        {option.label}
-                      </span>
-                      {active && <Check size={16} aria-hidden />}
-                    </button>
+              <ul
+                id={listId}
+                role="listbox"
+                aria-labelledby={fieldId}
+                tabIndex={-1}
+              >
+                {loading ? (
+                  <li className="flex items-center gap-2 px-4 py-3 text-body-sm text-slate-500">
+                    <LoaderCircle
+                      size={16}
+                      className="animate-spin text-primary-600"
+                      aria-hidden
+                    />
+                    {loadingText}
                   </li>
-                );
-              })}
-              {!filtered.length && (
-                <li className="px-4 py-3 text-body-sm text-slate-500">
-                  No results found
-                </li>
-              )}
-            </ul>
+                ) : (
+                  visibleOptions.map((option) => {
+                    const active = option.value === value;
+                    return (
+                      <li
+                        key={option.value}
+                        role="option"
+                        aria-selected={active}
+                      >
+                        <button
+                          type="button"
+                          className={cn(
+                            "dropdown-item w-full",
+                            active && "dropdown-item-active",
+                          )}
+                          onClick={() => {
+                            onChange(option.value);
+                            setOpen(false);
+                            setQuery("");
+                            resetVisibleCount();
+                            buttonRef.current?.focus();
+                          }}
+                        >
+                          <span>
+                            {option.code && (
+                              <span className="mr-1 text-caption uppercase">
+                                {option.code}
+                              </span>
+                            )}
+                            {option.label}
+                          </span>
+                          {active && <Check size={16} aria-hidden />}
+                        </button>
+                      </li>
+                    );
+                  })
+                )}
+                {!loading && !filtered.length && (
+                  <li className="px-4 py-3 text-body-sm text-slate-500">
+                    No results found
+                  </li>
+                )}
+                {!loading && loadingMore && (
+                  <li className="flex items-center gap-2 px-4 py-3 text-body-sm text-slate-500">
+                    <LoaderCircle
+                      size={16}
+                      className="animate-spin text-primary-600"
+                      aria-hidden
+                    />
+                    Loading more...
+                  </li>
+                )}
+              </ul>
+            </div>
           </div>
         )}
       </div>
