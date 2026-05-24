@@ -1,9 +1,10 @@
 "use client";
 
 import { AlertTriangle, Check, ChevronDown, Search, X } from "lucide-react";
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useId } from "react";
 import { Badge } from "@/components/atoms/Badge";
 import { FormField } from "@/components/molecules/FormField";
+import { useMultiSelectFieldLogic } from "@/hooks/useMultiSelectFieldLogic";
 import { cn } from "@/utils/twMerge";
 
 type Option<T extends string> = { label: string; value: T };
@@ -35,55 +36,26 @@ export function MultiSelectField<T extends string>({
 }: MultiSelectFieldProps<T>) {
   const id = useId();
   const listId = `${id}-listbox`;
-  const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const selected = options.filter((option) => values.includes(option.value));
-  const visible = open && !disabled;
-  const maxSelected = values.length >= max;
-  const filtered = useMemo(
-    () =>
-      options.filter((option) =>
-        option.label.toLowerCase().includes(query.toLowerCase()),
-      ),
-    [options, query],
-  );
-  const toggle = (value: T) => {
-    if (values.includes(value)) onChange(values.filter((v) => v !== value));
-    else if (values.length < max) onChange([...values, value]);
-  };
-
-  const removeValue = (value: T) => {
-    onChange(values.filter((currentValue) => currentValue !== value));
-  };
-
-  useEffect(() => {
-    if (!visible) return;
-
-    const closeOnOutsideClick = (event: PointerEvent) => {
-      if (!wrapperRef.current?.contains(event.target as Node)) {
-        setOpen(false);
-        setQuery("");
-      }
-    };
-
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setOpen(false);
-        setQuery("");
-        triggerRef.current?.focus();
-      }
-    };
-
-    document.addEventListener("pointerdown", closeOnOutsideClick);
-    document.addEventListener("keydown", closeOnEscape);
-
-    return () => {
-      document.removeEventListener("pointerdown", closeOnOutsideClick);
-      document.removeEventListener("keydown", closeOnEscape);
-    };
-  }, [visible]);
+  const {
+    clearValues,
+    filtered,
+    maxSelected,
+    query,
+    removeValue,
+    selected,
+    setQuery,
+    toggleDropdown,
+    toggleValue,
+    triggerRef,
+    visible,
+    wrapperRef,
+  } = useMultiSelectFieldLogic({
+    values,
+    options,
+    onChange,
+    max,
+    disabled,
+  });
 
   return (
     <FormField
@@ -103,9 +75,7 @@ export function MultiSelectField<T extends string>({
           aria-expanded={visible}
           aria-controls={listId}
           disabled={disabled}
-          onClick={() => {
-            if (!disabled) setOpen((v) => !v);
-          }}
+          onClick={toggleDropdown}
           className={cn(
             "form-input flex h-auto min-h-11 items-center justify-between text-left",
             visible && "border-primary-600 ring-2 ring-primary-600/20",
@@ -151,13 +121,13 @@ export function MultiSelectField<T extends string>({
                 className="inline-flex rounded-full outline-none focus:ring-2 focus:ring-primary-600/30"
                 onClick={(event) => {
                   event.stopPropagation();
-                  onChange([]);
+                  clearValues();
                 }}
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === " ") {
                     event.preventDefault();
                     event.stopPropagation();
-                    onChange([]);
+                    clearValues();
                   }
                 }}
               >
@@ -210,7 +180,7 @@ export function MultiSelectField<T extends string>({
                         "dropdown-item w-full justify-start gap-3 disabled:cursor-not-allowed disabled:opacity-50",
                         checked && "dropdown-item-active",
                       )}
-                      onClick={() => toggle(option.value)}
+                      onClick={() => toggleValue(option.value)}
                     >
                       <span
                         className={cn(

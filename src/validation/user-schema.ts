@@ -2,6 +2,7 @@ import { z } from "zod";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
+/* User form validation schema */
 export const userFormSchema = z.object({
   fullName: z
     .string()

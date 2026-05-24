@@ -1,5 +1,10 @@
 import { Metadata } from "next";
 
+/*
+  Meta data for the Home and Users pages. This includes the title, description, 
+  keywords, authors, and creator information for SEO purposes.
+*/
+
 export const HOME_META_DATA = {
   title: "User Manager System | React Stepper",
   description:

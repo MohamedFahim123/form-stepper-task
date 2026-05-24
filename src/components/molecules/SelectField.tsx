@@ -1,17 +1,10 @@
 "use client";
 
 import { Check, ChevronDown, LoaderCircle, Search } from "lucide-react";
-import {
-  type UIEvent,
-  useCallback,
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useId } from "react";
 import { cn } from "@/utils/twMerge";
 import { FormField } from "@/components/molecules/FormField";
+import { useSelectFieldLogic } from "@/hooks/useSelectFieldLogic";
 
 type Option<T extends string> = { label: string; value: T; code?: string };
 
@@ -51,98 +44,26 @@ export function SelectField<T extends string>({
   const reactId = useId();
   const fieldId = id ?? reactId;
   const listId = `${fieldId}-listbox`;
-  const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
-  const [visibleCount, setVisibleCount] = useState(
-    () => pageSize ?? options.length,
-  );
-  const [loadingMore, setLoadingMore] = useState(false);
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const loadingMoreTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
-  const selected = options.find((option) => option.value === value);
-  const visible = open && !disabled;
-  const canPaginate = Boolean(pageSize);
-  const filtered = useMemo(
-    () =>
-      options.filter((option) =>
-        option.label.toLowerCase().includes(query.toLowerCase()),
-      ),
-    [options, query],
-  );
-  const visibleOptions = canPaginate
-    ? filtered.slice(0, visibleCount)
-    : filtered;
-  const hasMoreOptions = visibleOptions.length < filtered.length;
-  const resetVisibleCount = useCallback(() => {
-    setVisibleCount(pageSize ?? options.length);
-  }, [options.length, pageSize]);
-
-  const loadNextPage = () => {
-    if (
-      !pageSize ||
-      loadingMore ||
-      loadingMoreTimeoutRef.current ||
-      !hasMoreOptions
-    ) {
-      return;
-    }
-
-    setLoadingMore(true);
-    loadingMoreTimeoutRef.current = setTimeout(() => {
-      setVisibleCount((currentCount) =>
-        Math.min(currentCount + pageSize, filtered.length),
-      );
-      setLoadingMore(false);
-      loadingMoreTimeoutRef.current = null;
-    }, 200);
-  };
-
-  const handleOptionsScroll = (event: UIEvent<HTMLDivElement>) => {
-    const { scrollHeight, scrollTop, clientHeight } = event.currentTarget;
-    const reachedBottom = scrollHeight - scrollTop - clientHeight < 24;
-
-    if (reachedBottom) loadNextPage();
-  };
-
-  useEffect(() => {
-    if (!visible) return;
-
-    const closeOnOutsideClick = (event: PointerEvent) => {
-      if (!wrapperRef.current?.contains(event.target as Node)) {
-        setOpen(false);
-        setQuery("");
-        resetVisibleCount();
-      }
-    };
-
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setOpen(false);
-        setQuery("");
-        resetVisibleCount();
-        buttonRef.current?.focus();
-      }
-    };
-
-    document.addEventListener("pointerdown", closeOnOutsideClick);
-    document.addEventListener("keydown", closeOnEscape);
-
-    return () => {
-      document.removeEventListener("pointerdown", closeOnOutsideClick);
-      document.removeEventListener("keydown", closeOnEscape);
-    };
-  }, [resetVisibleCount, visible]);
-
-  useEffect(() => {
-    return () => {
-      if (loadingMoreTimeoutRef.current) {
-        clearTimeout(loadingMoreTimeoutRef.current);
-      }
-    };
-  }, []);
+  const {
+    buttonRef,
+    filtered,
+    handleOptionsScroll,
+    loadingMore,
+    query,
+    selected,
+    selectOption,
+    toggleDropdown,
+    updateQuery,
+    visible,
+    visibleOptions,
+    wrapperRef,
+  } = useSelectFieldLogic({
+    value,
+    options,
+    onChange,
+    disabled,
+    pageSize,
+  });
 
   return (
     <FormField
@@ -161,13 +82,7 @@ export function SelectField<T extends string>({
           aria-expanded={visible}
           aria-controls={listId}
           disabled={disabled}
-          onClick={() => {
-            if (!disabled) {
-              if (open) setQuery("");
-              resetVisibleCount();
-              setOpen(!open);
-            }
-          }}
+          onClick={toggleDropdown}
           className={cn(
             "form-input flex items-center justify-between text-left",
             visible && "border-primary-600 ring-2 ring-primary-600/20",
@@ -196,10 +111,7 @@ export function SelectField<T extends string>({
                   className="form-input h-9 pl-9"
                   placeholder="Search..."
                   value={query}
-                  onChange={(e) => {
-                    setQuery(e.target.value);
-                    resetVisibleCount();
-                  }}
+                  onChange={(e) => updateQuery(e.target.value)}
                   autoFocus
                 />
               </div>
@@ -238,13 +150,7 @@ export function SelectField<T extends string>({
                             "dropdown-item w-full",
                             active && "dropdown-item-active",
                           )}
-                          onClick={() => {
-                            onChange(option.value);
-                            setOpen(false);
-                            setQuery("");
-                            resetVisibleCount();
-                            buttonRef.current?.focus();
-                          }}
+                          onClick={() => selectOption(option.value)}
                         >
                           <span>
                             {option.code && (

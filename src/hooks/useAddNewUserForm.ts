@@ -36,6 +36,11 @@ const preferenceFields: (keyof UserFormSchema)[] = [
   "avatar",
 ];
 
+/**
+ * toOption function converts a Category, Country, or Interest object into an option format with label and value properties.
+ * @param item - The item to convert, which can be a Category, Country, or Interest.
+ * @returns An object with label and value properties for use in select inputs.
+ */
 function toOption(item: Category | Country | Interest) {
   return {
     label: item.name,
@@ -43,6 +48,12 @@ function toOption(item: Category | Country | Interest) {
   };
 }
 
+/**
+ * findById function searches for an item in an array of Category, Country, or Interest objects by its id.
+ * @param items - The array of items to search through.
+ * @param id - The id of the item to find.
+ * @returns The item with the matching id, or undefined if not found.
+ */
 function findById<T extends Category | Country | Interest>(
   items: T[],
   id: string,
@@ -50,6 +61,14 @@ function findById<T extends Category | Country | Interest>(
   return items.find((item) => String(item.id) === id);
 }
 
+/**
+ * toUserPayload function converts the form values into a UserPayload object.
+ * @param values - The form values.
+ * @param countries - The list of countries.
+ * @param categories - The list of categories.
+ * @param interests - The list of interests.
+ * @returns A UserPayload object.
+ */
 function toUserPayload(
   values: UserFormSchema,
   countries: Country[],
@@ -81,6 +100,12 @@ export const useAddNewUserForm = () => {
   const currentStep = useAppSelector(selectCurrentStep);
   const completedSteps = useAppSelector(selectCompletedSteps);
 
+  const [success, setSuccess] = useState(false);
+  const countriesQuery = useCountriesQuery();
+  const categoriesQuery = useCategoriesQuery();
+  const interestsQuery = useInterestsQuery();
+  const createUser = useMutateUser();
+
   const form = useForm<UserFormSchema>({
     resolver: zodResolver(userFormSchema),
     mode: "onChange",
@@ -96,16 +121,11 @@ export const useAddNewUserForm = () => {
     },
   });
 
-  const [success, setSuccess] = useState(false);
-  const countriesQuery = useCountriesQuery();
-  const categoriesQuery = useCategoriesQuery();
-  const interestsQuery = useInterestsQuery();
-  const createUser = useMutateUser();
-
   const countries = countriesQuery.data ?? [];
   const categories = categoriesQuery.data ?? [];
   const interests = interestsQuery.data ?? [];
 
+  // Generate options for select inputs from the fetched data
   const countryOptions = countries.map(toOption);
   const categoryOptions = categories.map(toOption);
   const interestOptions = interests.map(toOption);
@@ -123,16 +143,25 @@ export const useAddNewUserForm = () => {
     dispatch(resetStepper());
   }, [dispatch]);
 
+  /**
+   * Navigates to the next step in the form.
+   */
   const goNext = async () => {
     const fields = currentStep === 0 ? personalFields : preferenceFields;
     const valid = await form.trigger(fields);
     if (valid) dispatch(nextStep());
   };
 
+  /**
+   * Navigates to the previous step in the form.
+   */
   const goBack = () => {
     dispatch(prevStep());
   };
 
+  /**
+   * Submits the form and creates a new user.
+   */
   const submit = form.handleSubmit(async (values) => {
     await createUser.mutateAsync(
       toUserPayload(values, countries, categories, interests),
@@ -141,12 +170,18 @@ export const useAddNewUserForm = () => {
     setSuccess(true);
   });
 
+  /**
+   * Resets the form and stepper state to the initial values, and sets success to false.
+   */
   const reset = () => {
     form.reset();
     dispatch(resetStepper());
     setSuccess(false);
   };
 
+  /**
+   * Closes the success message and navigates to the users page.
+   */
   const closeSuccess = () => {
     setSuccess(false);
     router.push("/users");
