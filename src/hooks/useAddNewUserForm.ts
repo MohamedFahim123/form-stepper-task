@@ -108,7 +108,7 @@ export const useAddNewUserForm = () => {
 
   const form = useForm<UserFormSchema>({
     resolver: zodResolver(userFormSchema),
-    mode: "onChange",
+    mode: "onBlur",
     defaultValues: {
       fullName: "",
       email: "",
